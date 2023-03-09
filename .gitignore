@@ -130,3 +130,6 @@ dmypy.json
 
 
 .idea
+app.db
+migrations
+
