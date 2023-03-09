@@ -30,7 +30,7 @@ class SalesOutlet(db.Model):
 
 class Customer(db.Model):
     customer_id = db.Column(db.Integer, primary_key=True)
-    home_store = db.Column(db.Integer)
+    home_store = db.Column(db.Integer, db.ForeignKey('sales_outlet.sales_outlet_id'))
     name = db.Column(db.String(120))
     email = db.Column(db.String(120))
     customer_since = db.Column(db.Date)
