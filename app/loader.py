@@ -2,13 +2,33 @@ import csv
 import datetime
 import logging
 from zipfile import ZipFile
-from app.models import db, Customer
+from app.models import db, Customer, Staff, SalesOutlet
 from io import StringIO
 
 
 
 LOGGER = logging.getLogger(__name__)
 MAPPING = [
+    {
+        "file": "staff.csv",
+        "model": Staff,
+        "rename_columns": [],
+        "transform_columns": [
+            ("start_date", lambda x: datetime.datetime.strptime(x, "%m/%d/%Y").date()),
+        ],
+    },
+    {
+        "file": "sales_outlet.csv",
+        "model": SalesOutlet,
+        "rename_columns": [
+            ("Neighorhood", "neighborhood"),
+        ],
+        "transform_columns": [
+            ("manager", lambda x: None if not x else int(x)),
+        ],
+    },
+
+
     {
         "file": "customer.csv",
         "model": Customer,
@@ -19,7 +39,7 @@ MAPPING = [
         "transform_columns": [
             ("customer_since", lambda x: datetime.datetime.strptime(x, "%Y-%m-%d").date()),
             ("birthdate", lambda x: datetime.datetime.strptime(x, "%Y-%m-%d").date()),
-        ]
+        ],
     },
 ]
 
@@ -75,6 +95,9 @@ class DataLoader:
     def read_row(cls, row, rule):
         kwargs = dict()
         for key, value in row.items():
+            if not key:
+                continue
+
             if key in rule["rename_columns"]:
                 key = rule["rename_columns"][key]
 
