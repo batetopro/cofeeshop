@@ -64,13 +64,28 @@ class Product(db.Model):
         return '<Product {}>'.format(self.product)
 
 
+class Date(db.Model):
+    transaction_date = db.Column(db.Date, primary_key=True)
+    date_id = db.Column(db.String(8))
+    week_id = db.Column(db.SmallInteger)
+    week_desc = db.Column(db.String(32))
+    month_id = db.Column(db.SmallInteger)
+    month_name = db.Column(db.String(32))
+    quarter_id = db.Column(db.SmallInteger)
+    quarter_name = db.Column(db.String(32))
+    year_id = db.Column(db.SmallInteger)
+
+    def __repr__(self):
+        return '<Date {}>'.format(self.transaction_date)
+
+
 class Receipt(db.Model):
     __table_args__ = (
         db.PrimaryKeyConstraint('transaction_id', 'transaction_date', 'transaction_time', 'sales_outlet_id'),
     )
 
     transaction_id = db.Column(db.Integer)
-    transaction_date = db.Column(db.Date)
+    transaction_date = db.Column(db.Date, db.ForeignKey('date.transaction_date'))
     transaction_time = db.Column(db.Time)
     sales_outlet_id = db.Column(db.Integer, db.ForeignKey('sales_outlet.sales_outlet_id'))
     staff_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id'))
@@ -84,4 +99,6 @@ class Receipt(db.Model):
     unit_price = db.Column(db.Float(decimal_return_scale=2))
     promo_item_yn = db.Column(db.String(1))
 
+    def __repr__(self):
+        return '<Receipt {} {} {}>'.format(self.transaction_id, self.transaction_date, self.transaction_time)
 
