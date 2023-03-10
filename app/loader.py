@@ -186,6 +186,7 @@ class DataLoader:
 
                 with zf.open(rule["file"]) as fp:
                     LOGGER.info("Reading from '{}' ...".format(rule["file"]))
+                    ctr = 0
                     for row in self.fp_to_reader(fp):
                         entry = self.read_row(row, rule)
                         self.db.session.add(entry)
@@ -194,3 +195,6 @@ class DataLoader:
                         except Exception as err:
                             self.db.session.rollback()
                             LOGGER.error("Error: {}".format(err))
+                        else:
+                            ctr += 1
+                    LOGGER.info("{} records found.".format(ctr))

@@ -1,5 +1,9 @@
 import datetime
+import logging
 from app.config import Config
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class ReaderEngine:
@@ -11,13 +15,13 @@ class ReaderEngine:
         self._reader = reader
 
     def read_birthdays(self, date):
-        raise NotImplemented
+        raise NotImplementedError
 
     def read_top_selling_products(self, year):
-        raise NotImplemented
+        raise NotImplementedError
 
     def read_last_order_per_customer(self):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class SqliteEngine(ReaderEngine):
@@ -63,7 +67,25 @@ class MySQLEngine(ReaderEngine):
 
 
 class PostgreSQLEngine(ReaderEngine):
-    pass
+    def read_birthdays(self, date):
+        sql = """
+        SELECT customer_id, name
+        FROM customer
+        WHERE extract(month from birthdate) = :month
+            AND extract(day from birthdate) = :day  
+        ORDER BY customer_id ASC 
+        """
+        params = dict(day=date.day, month=date.month)
+
+        rows = self.reader.db.session.execute(self.reader.db.text(sql), params)
+
+        result = []
+        for row in rows:
+            result.append({
+                "customer_id": row[0],
+                "customer_first_name": row[1],
+            })
+        return result
 
 
 class DataReader:
@@ -84,7 +106,7 @@ class DataReader:
             elif Config.SQLALCHEMY_DATABASE_URI.startswith("postgresql"):
                 self._engine = PostgreSQLEngine(self)
             else:
-                raise NotImplemented
+                raise NotImplementedError
         return self._engine
 
     def __init__(self, db=None, engine=None):
@@ -94,7 +116,10 @@ class DataReader:
     def read_birthdays(self, date=None):
         if date is None:
             date = datetime.date.today()
-        return self.engine.read_birthdays(date)
+        LOGGER.info("Reading birthdays on '{}'".format(date))
+        result = self.engine.read_birthdays(date)
+        LOGGER.info("{} records found.".format(len(result)))
+        return result
 
     def read_top_selling_products(self, year):
         return self.engine.read_top_selling_products(year)
