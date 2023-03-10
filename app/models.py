@@ -140,3 +140,7 @@ class Receipt(db.Model):
     def __repr__(self):
         return '<Receipt {} {} {}>'.format(self.transaction_id, self.transaction_date, self.transaction_time)
 
+
+class Test(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    square = db.Column(db.Integer)

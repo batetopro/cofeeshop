@@ -2,7 +2,7 @@ import csv
 import datetime
 import logging
 from zipfile import ZipFile
-from app.models import db, Customer, Staff, SalesOutlet, Product, \
+from app.models import Customer, Staff, SalesOutlet, Product, \
     Receipt, Date, Generation, PastryInventory, SalesTarget
 from io import StringIO
 
@@ -112,8 +112,16 @@ class DataLoader:
             self._mapping = MAPPING
         return self._mapping
 
-    def __init__(self, mapping=None):
+    @property
+    def db(self):
+        if self._db is None:
+            from app.models import db
+            self._db = db
+        return self._db
+
+    def __init__(self, db=None, mapping=None):
         self._mapping = mapping
+        self._db = db
 
     @classmethod
     def prepare_mapping_rule(cls, rule):
@@ -180,9 +188,9 @@ class DataLoader:
                     LOGGER.info("Reading from '{}' ...".format(rule["file"]))
                     for row in self.fp_to_reader(fp):
                         entry = self.read_row(row, rule)
-                        db.session.add(entry)
+                        self.db.session.add(entry)
                         try:
-                            db.session.commit()
+                            self.db.session.commit()
                         except Exception as err:
-                            db.session.rollback()
+                            self.db.session.rollback()
                             LOGGER.error("Error: {}".format(err))
