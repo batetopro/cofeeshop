@@ -3,3 +3,5 @@ python-dotenv
 flask-sqlalchemy
 flask-migrate
 click
+PyMySQL
+psycopg2
