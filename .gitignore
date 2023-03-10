@@ -132,4 +132,6 @@ dmypy.json
 .idea
 app.db
 migrations
+app.db-journal
+
 

@@ -118,7 +118,8 @@ class SalesTarget(db.Model):
 
 class Receipt(db.Model):
     __table_args__ = (
-        db.PrimaryKeyConstraint('transaction_id', 'transaction_date', 'transaction_time', 'sales_outlet_id'),
+        db.PrimaryKeyConstraint('transaction_id', 'transaction_date',
+                                'transaction_time', 'sales_outlet_id', 'order', "line_item_id"),
     )
 
     transaction_id = db.Column(db.Integer)
