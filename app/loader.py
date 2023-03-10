@@ -2,7 +2,7 @@ import csv
 import datetime
 import logging
 from zipfile import ZipFile
-from app.models import db, Customer, Staff, SalesOutlet
+from app.models import db, Customer, Staff, SalesOutlet, Product, Receipt
 from io import StringIO
 
 
@@ -27,8 +27,14 @@ MAPPING = [
             ("manager", lambda x: None if not x else int(x)),
         ],
     },
-
-
+    {
+        "file": "product.csv",
+        "model": Product,
+        "rename_columns": [],
+        "transform_columns": [
+            ("current_retail_price", lambda x: float(x.lstrip('$'))),
+        ],
+    },
     {
         "file": "customer.csv",
         "model": Customer,
@@ -39,6 +45,16 @@ MAPPING = [
         "transform_columns": [
             ("customer_since", lambda x: datetime.datetime.strptime(x, "%Y-%m-%d").date()),
             ("birthdate", lambda x: datetime.datetime.strptime(x, "%Y-%m-%d").date()),
+        ],
+    },
+    {
+        "file": "sales_reciepts.csv",
+        "model": Receipt,
+        "rename_columns": [
+        ],
+        "transform_columns": [
+            ("transaction_date", lambda x: datetime.datetime.strptime(x, "%Y-%m-%d").date()),
+            ("transaction_time", lambda x: datetime.datetime.strptime(x, "%H:%M:%S").time()),
         ],
     },
 ]

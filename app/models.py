@@ -27,6 +27,9 @@ class SalesOutlet(db.Model):
     manager = db.Column(db.Integer, db.ForeignKey('staff.staff_id'), nullable=True)
     neighborhood = db.Column(db.String(32))
 
+    def __repr__(self):
+        return '<SalesOutlet {}>'.format(self.store_address)
+
 
 class Customer(db.Model):
     customer_id = db.Column(db.Integer, primary_key=True)
@@ -41,4 +44,44 @@ class Customer(db.Model):
 
     def __repr__(self):
         return '<Customer {}>'.format(self.name)
+
+
+class Product(db.Model):
+    product_id = db.Column(db.Integer, primary_key=True)
+    product_group = db.Column(db.String(120))
+    product_category = db.Column(db.String(120))
+    product_type = db.Column(db.String(120))
+    product = db.Column(db.String(120))
+    product_description = db.Column(db.Text)
+    unit_of_measure = db.Column(db.String(32))
+    current_wholesale_price = db.Column(db.Float(decimal_return_scale=2))
+    current_retail_price = db.Column(db.Float(decimal_return_scale=2))
+    tax_exempt_yn = db.Column(db.String(1))
+    promo_yn = db.Column(db.String(1))
+    new_product_yn = db.Column(db.String(1))
+
+    def __repr__(self):
+        return '<Product {}>'.format(self.product)
+
+
+class Receipt(db.Model):
+    __table_args__ = (
+        db.PrimaryKeyConstraint('transaction_id', 'transaction_date', 'transaction_time', 'sales_outlet_id'),
+    )
+
+    transaction_id = db.Column(db.Integer)
+    transaction_date = db.Column(db.Date)
+    transaction_time = db.Column(db.Time)
+    sales_outlet_id = db.Column(db.Integer, db.ForeignKey('sales_outlet.sales_outlet_id'))
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id'))
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.customer_id'))
+    instore_yn = db.Column(db.String(1))
+    order = db.Column(db.SmallInteger)
+    line_item_id = db.Column(db.SmallInteger)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'))
+    quantity = db.Column(db.Integer)
+    line_item_amount = db.Column(db.Float(decimal_return_scale=2))
+    unit_price = db.Column(db.Float(decimal_return_scale=2))
+    promo_item_yn = db.Column(db.String(1))
+
 
