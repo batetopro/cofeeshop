@@ -2,7 +2,8 @@ import csv
 import datetime
 import logging
 from zipfile import ZipFile
-from app.models import db, Customer, Staff, SalesOutlet, Product, Receipt, Date
+from app.models import db, Customer, Staff, SalesOutlet, Product, \
+    Receipt, Date, Generation, PastryInventory, SalesTarget
 from io import StringIO
 
 
@@ -52,8 +53,32 @@ MAPPING = [
             ("transaction_date", lambda x: datetime.datetime.strptime(x, "%m/%d/%Y").date()),
         ],
     },
+    {
+        "file": "generations.csv",
+        "model": Generation,
+        "rename_columns": [],
+        "transform_columns": [],
+    },
+    {
+        "file": "pastry inventory.csv",
+        "model": PastryInventory,
+        "rename_columns": [
+            ("% waste", "waste_percent"),
+        ],
+        "transform_columns": [
+            ("transaction_date", lambda x: datetime.datetime.strptime(x, "%m/%d/%Y").date()),
+            ("waste_percent", lambda x: x.rstrip("%")),
+        ],
+    },
 
-
+    {
+        "file": "sales targets.csv",
+        "model": SalesTarget,
+        "rename_columns": [
+            ("merchandise _goal", "merchandise_goal"),
+        ],
+        "transform_columns": [],
+    },
 
     {
         "file": "customer.csv",

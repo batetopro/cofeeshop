@@ -40,7 +40,7 @@ class Customer(db.Model):
     loyalty_card_number = db.Column(db.String(12))
     birthdate = db.Column(db.Date)
     gender = db.Column(db.String(1))
-    birth_year = db.Column(db.Integer)
+    birth_year = db.Column(db.Integer, db.ForeignKey('generation.birth_year'))
 
     def __repr__(self):
         return '<Customer {}>'.format(self.name)
@@ -77,6 +77,43 @@ class Date(db.Model):
 
     def __repr__(self):
         return '<Date {}>'.format(self.transaction_date)
+
+
+class Generation(db.Model):
+    birth_year = db.Column(db.Integer, primary_key=True)
+    generation = db.Column(db.String(64))
+
+    def __repr__(self):
+        return '<Generation {}>'.format(self.birth_year)
+
+
+class PastryInventory(db.Model):
+    __table_args__ = (
+        db.PrimaryKeyConstraint('sales_outlet_id', 'transaction_date', 'product_id'),
+    )
+
+    sales_outlet_id = db.Column(db.Integer, db.ForeignKey('sales_outlet.sales_outlet_id'))
+    transaction_date = db.Column(db.Date, db.ForeignKey('date.transaction_date'))
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'))
+    start_of_day = db.Column(db.Integer)
+    quantity_sold = db.Column(db.Integer)
+    waste = db.Column(db.Integer)
+    waste_percent = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<PastryInventory {}>'.format(self.birth_year)
+
+class SalesTarget(db.Model):
+    __table_args__ = (
+        db.PrimaryKeyConstraint('sales_outlet_id', 'year_month'),
+    )
+    sales_outlet_id = db.Column(db.Integer, db.ForeignKey('sales_outlet.sales_outlet_id'))
+    year_month = db.Column(db.String(6))
+    beans_goal = db.Column(db.Integer)
+    beverage_goal = db.Column(db.Integer)
+    food_goal = db.Column(db.Integer)
+    merchandise_goal = db.Column(db.Integer)
+    total_goal = db.Column(db.Integer)
 
 
 class Receipt(db.Model):
