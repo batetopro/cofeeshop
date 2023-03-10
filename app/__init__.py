@@ -30,4 +30,15 @@ def load_data():
     loader.run(Config.DATASET_ARCHIVE)
 
 
+@click.command(name='tests')
+@with_appcontext
+def run_tests():
+    import unittest
+    tests = unittest.TestLoader().discover('tests')
+
+    test_runner = unittest.TextTestRunner()
+    test_runner.run(tests)
+
+
 app.cli.add_command(load_data)
+app.cli.add_command(run_tests)
