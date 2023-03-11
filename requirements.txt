@@ -5,3 +5,7 @@ flask-migrate
 click
 PyMySQL
 psycopg2
+fastapi
+uvicorn[standard]
+sqlalchemy
+
