@@ -43,6 +43,29 @@ class SqliteEngine(ReaderEngine):
             })
         return result
 
+    def read_top_selling_products(self, year):
+        sql = """
+        SELECT p.product, SUM(r.quantity)
+        FROM receipt r
+        JOIN product p ON p.product_id = r.product_id
+        JOIN date d ON d.transaction_date = r.transaction_date
+        WHERE d.year_id = {}
+        GROUP BY p.product_id
+        ORDER BY SUM(quantity) DESC
+        LIMIT 10
+        """.format(year)
+
+        rows = self.reader.db.session.execute(self.reader.db.text(sql))
+
+        result = []
+        for row in rows:
+            result.append({
+                "product_name": row[0],
+                "total_sales": row[1],
+            })
+        return result
+
+
 
 class MySQLEngine(ReaderEngine):
     def read_birthdays(self, date):
@@ -65,6 +88,30 @@ class MySQLEngine(ReaderEngine):
             })
         return result
 
+    def read_top_selling_products(self, year):
+        sql = """
+        SELECT p.product, SUM(r.quantity)
+        FROM receipt r
+        JOIN product p ON p.product_id = r.product_id
+        JOIN date d ON d.transaction_date = r.transaction_date
+        WHERE d.year_id = :year
+        GROUP BY p.product_id
+        ORDER BY SUM(quantity) DESC
+        LIMIT 10
+        """
+
+        params = dict(year=year)
+
+        rows = self.reader.db.session.execute(self.reader.db.text(sql), params)
+
+        result = []
+        for row in rows:
+            result.append({
+                "product_name": row[0],
+                "total_sales": row[1],
+            })
+        return result
+
 
 class PostgreSQLEngine(ReaderEngine):
     def read_birthdays(self, date):
@@ -84,6 +131,30 @@ class PostgreSQLEngine(ReaderEngine):
             result.append({
                 "customer_id": row[0],
                 "customer_first_name": row[1],
+            })
+        return result
+
+    def read_top_selling_products(self, year):
+        sql = """
+        SELECT p.product, SUM(r.quantity)
+        FROM receipt r
+        JOIN product p ON p.product_id = r.product_id
+        JOIN date d ON d.transaction_date = r.transaction_date
+        WHERE d.year_id = :year
+        GROUP BY p.product_id
+        ORDER BY SUM(quantity) DESC
+        LIMIT 10
+        """
+
+        params = dict(year=year)
+
+        rows = self.reader.db.session.execute(self.reader.db.text(sql), params)
+
+        result = []
+        for row in rows:
+            result.append({
+                "product_name": row[0],
+                "total_sales": row[1],
             })
         return result
 
@@ -122,7 +193,10 @@ class DataReader:
         return result
 
     def read_top_selling_products(self, year):
-        return self.engine.read_top_selling_products(year)
+        LOGGER.info("Reading top selling products on '{}'".format(year))
+        result = self.engine.read_top_selling_products(year)
+        LOGGER.info("{} records found.".format(len(result)))
+        return result
 
     def read_last_order_per_customer(self):
         return self.engine.read_last_order_per_customer()

@@ -1,12 +1,11 @@
 import datetime
 import unittest
 from app.reader import DataReader
-from app import db
 
 
 class ReaderTest(unittest.TestCase):
     def test_birthdates(self):
-        reader = DataReader(db=db)
+        reader = DataReader()
         birthdays = reader.read_birthdays(datetime.date.fromtimestamp(1678468782))
         self.assertEqual(birthdays[0]["customer_id"], 35)
         self.assertEqual(birthdays[1]["customer_id"], 5245)
@@ -15,6 +14,15 @@ class ReaderTest(unittest.TestCase):
         self.assertEqual(birthdays[4]["customer_id"], 5778)
         self.assertEqual(birthdays[5]["customer_id"], 8418)
         self.assertEqual(len(birthdays), 6)
+
+    def test_top_selling_products(self):
+        reader = DataReader()
+        products = reader.read_top_selling_products(2019)
+        self.assertEqual(products[0]["product_name"], 'Earl Grey Rg')
+        self.assertEqual(products[1]["product_name"], 'Dark chocolate Lg')
+        self.assertEqual(products[2]["product_name"], 'Latte')
+        self.assertEqual(products[3]["product_name"], 'Morning Sunrise Chai Rg')
+        self.assertEqual(len(products), 10)
 
 
 
