@@ -7,14 +7,23 @@ app = FastAPI()
 
 @app.get("/customers/birthday")
 async def birthday():
-    return DataReader().read_birthdays()
+    """
+    Get list of customers, which have birthday today.
+    """
+    return {"customers": DataReader().read_birthdays()}
 
 
 @app.get("/products/top-selling-products/{year:int}")
-async def birthday(year: int):
-    return DataReader().read_top_selling_products(year)
+async def top_selling_products(year: int):
+    """
+    The top 10 selling products for a specific year.
+    """
+    return {"products": DataReader().read_top_selling_products(year)}
 
 
 @app.get("/customers/last-order-per-customer")
-async def birthday():
-    return DataReader().read_last_order_per_customer()
+async def last_order_per_customer():
+    """
+    The last order per customer with their email.
+    """
+    return {"customers": DataReader().read_last_order_per_customer()}

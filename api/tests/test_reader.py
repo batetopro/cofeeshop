@@ -1,10 +1,10 @@
 import datetime
 import unittest
-from api.reader import DataReader
+from .reader import DataReader
 
 
 class ReaderTest(unittest.TestCase):
-    def test_birthdates(self):
+    def test_birthdays(self):
         reader = DataReader()
         birthdays = reader.read_birthdays(datetime.date.fromtimestamp(1678468782))
         self.assertEqual(birthdays[0]["customer_id"], 35)
