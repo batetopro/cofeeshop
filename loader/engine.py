@@ -1,8 +1,12 @@
 import csv
-
 from io import StringIO
 import logging
-from zipfile import ZipFile
+import zipfile
+
+
+from flask_sqlalchemy import SQLAlchemy
+
+
 from .mapping import MAPPING
 
 
@@ -11,13 +15,21 @@ LOGGER = logging.getLogger(__name__)
 
 class DataLoadEngine:
     @property
-    def mapping(self):
+    def mapping(self) -> dict:
+        """
+        The mapping of the load engine.
+        :return: dict
+        """
         if self._mapping is None:
             self._mapping = MAPPING
         return self._mapping
 
     @property
-    def db(self):
+    def db(self) -> SQLAlchemy:
+        """
+        Database connection of the load engine.
+        :return: SQLAlchemy
+        """
         if self._db is None:
             from .models import db
             self._db = db
@@ -28,7 +40,16 @@ class DataLoadEngine:
         self._db = db
 
     @classmethod
-    def prepare_mapping_rule(cls, rule):
+    def prepare_mapping_rule(cls, rule: dict) -> bool:
+        """
+        Check and extend a mapping rule. One mapping rule should have:
+            * file - the CSV file from which data is read.
+            * model - the database model, which is loaded from the file.
+            * rename_columns - pairs of (name in file, model field name)
+            * transform_columns - pairs of (model field name, transformation function)
+        :param rule: dict
+        :return: bool - is the rule valid
+        """
         if "file" not in rule:
             LOGGER.error("Missing `file` in mapping rule.")
             return False
@@ -59,13 +80,24 @@ class DataLoadEngine:
         return True
 
     @classmethod
-    def fp_to_reader(cls, fp):
+    def fp_to_reader(cls, fp: zipfile.ZipExtFile) -> csv.DictReader:
+        """
+        Prepare a file descriptor from zip archive to csv.DictReader
+        :param fp: zipfile.ZipExtFile
+        :return: csv.DictReader
+        """
         content = fp.read().decode()
         data = StringIO(content)
         return csv.DictReader(data)
 
     @classmethod
-    def read_row(cls, row, rule):
+    def read_row(cls, row: dict, rule: dict) -> SQLAlchemy.Model:
+        """
+        Run a mapping rule over a single row from the CSV file and receive a SQLAlchemy.Model object.
+        :param row: dict
+        :param rule: dict
+        :return: SQLAlchemy.Model
+        """
         kwargs = dict()
         for key, value in row.items():
             if not key:
@@ -81,9 +113,15 @@ class DataLoadEngine:
 
         return rule["model"](**kwargs)
 
-    def run(self, archive_file):
+    def run(self, archive_file: str) -> None:
+        """
+        Run the loader engine with a .zip archive containing csv files.
+        :param archive_file: str
+        :return: None
+        """
+
         LOGGER.info("Reading archive file: {}".format(archive_file))
-        with ZipFile(archive_file) as zf:
+        with zipfile.ZipFile(archive_file) as zf:
             for rule in self.mapping:
                 if not self.prepare_mapping_rule(rule):
                     continue

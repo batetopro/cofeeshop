@@ -24,7 +24,11 @@ from . import models
 
 @click.command(name='load_data')
 @with_appcontext
-def load_data():
+def load_data() -> None:
+    """
+    Run the data loading engine.
+    :return: None
+    """
     from .engine import DataLoadEngine
     loader = DataLoadEngine(db=db)
     loader.run(Config.DATASET_ARCHIVE)
@@ -32,7 +36,12 @@ def load_data():
 
 @click.command(name='tests')
 @with_appcontext
-def run_tests():
+def run_tests() -> None:
+    """
+    Run unit-tests.
+    :return: None
+    """
+
     import unittest
     tests = unittest.TestLoader().discover('loader.tests')
 

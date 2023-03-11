@@ -1,9 +1,16 @@
+import datetime
 from sqlalchemy import text
 from .abstract import ReaderEngine
 
 
 class PostgreSQLEngine(ReaderEngine):
-    def read_birthdays(self, date):
+    def read_birthdays(self, date:datetime.date):
+        """
+        Get list of customers, which have birthday on the given date.
+        :param date: datetime.date
+        :return: List[dict]
+        """
+
         sql = """
         SELECT customer_id, name
         FROM customer
@@ -23,7 +30,12 @@ class PostgreSQLEngine(ReaderEngine):
             })
         return result
 
-    def read_top_selling_products(self, year):
+    def read_top_selling_products(self, year:int):
+        """
+        The top 10 selling products for a specific year.
+        :param year: int
+        :return: List[dict]
+        """
         sql = """
         SELECT p.product, SUM(r.quantity)
         FROM receipt r
@@ -48,6 +60,10 @@ class PostgreSQLEngine(ReaderEngine):
         return result
 
     def read_last_order_per_customer(self):
+        """
+        The last order per customer with their email.
+        :return: List[dict]
+        """
         sql = """
         SELECT c.customer_id, c.email, T.last_order_date
         FROM (

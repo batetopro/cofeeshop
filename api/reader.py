@@ -1,5 +1,6 @@
 import datetime
 import logging
+from typing import Union, List
 
 
 from sqlalchemy import create_engine
@@ -15,13 +16,21 @@ LOGGER = logging.getLogger(__name__)
 
 class DataReader:
     @property
-    def connection_string(self):
+    def connection_string(self) -> str:
+        """
+        Connection string used to connect to the database.
+        :return: str
+        """
         if self._connection_string is None:
             self._connection_string = Config.SQLALCHEMY_DATABASE_URI
         return self._connection_string
 
     @property
-    def db_type(self):
+    def db_type(self) -> Union[str, None]:
+        """
+        What database is used with the connection string.
+        :return: str | None
+        """
         if self.connection_string.startswith("sqlite"):
             return "sqlite"
         elif self.connection_string.startswith("mysql"):
@@ -33,6 +42,10 @@ class DataReader:
 
     @property
     def engine(self) -> ReaderEngine:
+        """
+        The engine that is used to make queries to the database.
+        :return: ReaderEngine
+        """
         if self._engine is None:
             if self.db_type == "sqlite":
                 self._engine = SqliteEngine(self)
@@ -57,11 +70,21 @@ class DataReader:
         return self._session
 
     def __init__(self, connection_string=None):
+        """
+        Initialize the data reader with connection string, which is used to connect to the database.
+        If None is given, then it uses the config.
+        :param connection_string: str
+        """
         self._connection_string = connection_string
         self._engine = None
         self._session = None
 
-    def read_birthdays(self, date=None):
+    def read_birthdays(self, date:datetime.date = None) -> List[dict]:
+        """
+        Get list of customers, which have birthday on the given date.
+        :param date: datetime.date | None
+        :return: List[dict]
+        """
         if date is None:
             date = datetime.date.today()
         LOGGER.info("Reading birthdays on '{}'".format(date))
@@ -69,13 +92,22 @@ class DataReader:
         LOGGER.info("{} records found.".format(len(result)))
         return result
 
-    def read_top_selling_products(self, year):
+    def read_top_selling_products(self, year: int) -> List[dict]:
+        """
+        The top 10 selling products for a specific year.
+        :param year: int
+        :return: List[dict]
+        """
         LOGGER.info("Reading top selling products on '{}'".format(year))
         result = self.engine.read_top_selling_products(year)
         LOGGER.info("{} records found.".format(len(result)))
         return result
 
-    def read_last_order_per_customer(self):
+    def read_last_order_per_customer(self) -> List[dict]:
+        """
+        The last order per customer with their email.
+        :return: List[dict]
+        """
         LOGGER.info("Reading last order per customer.")
         result = self.engine.read_last_order_per_customer()
         LOGGER.info("{} records found.".format(len(result)))

@@ -2,6 +2,13 @@ import datetime
 from .models import Customer, Staff, SalesOutlet, Product, \
     Receipt, Date, Generation, PastryInventory, SalesTarget
 
+"""
+One mapping rule should have:
+    * file - the CSV file from which data is read.
+    * model - the database model, which is loaded from the file.
+    * rename_columns - pairs of (name in file, model field name)
+    * transform_columns - pairs of (model field name, transformation function)
+"""
 
 MAPPING = [
     {
