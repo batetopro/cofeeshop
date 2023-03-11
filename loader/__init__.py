@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask.cli import with_appcontext
 
 
-from .config import Config
+from config import Config
 
 
 dictConfig(Config.LOGGING)
@@ -19,14 +19,14 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-from app import routes, models
+from . import models
 
 
 @click.command(name='load_data')
 @with_appcontext
 def load_data():
-    from .loader import DataLoader
-    loader = DataLoader()
+    from .engine import DataLoadEngine
+    loader = DataLoadEngine(db=db)
     loader.run(Config.DATASET_ARCHIVE)
 
 
@@ -34,7 +34,7 @@ def load_data():
 @with_appcontext
 def run_tests():
     import unittest
-    tests = unittest.TestLoader().discover('tests')
+    tests = unittest.TestLoader().discover('loader.tests')
 
     test_runner = unittest.TextTestRunner()
     test_runner.run(tests)

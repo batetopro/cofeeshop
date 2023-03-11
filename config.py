@@ -9,7 +9,7 @@ class Config(object):
                               'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DATASET_ARCHIVE = os.environ.get('DATASET_ARCHIVE') \
-                      or os.path.join(os.path.dirname(basedir), "assets", "dataset.zip")
+                      or os.path.join(basedir, "assets", "dataset.zip")
 
     LOGGING = {
         "version": 1,

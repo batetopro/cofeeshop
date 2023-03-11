@@ -1,7 +1,7 @@
 import os
 import unittest
-from app.loader import DataLoader
-from app.models import Test, db
+from ..engine import DataLoadEngine
+from ..models import Test, db
 
 
 class LoaderTest(unittest.TestCase):
@@ -18,9 +18,10 @@ class LoaderTest(unittest.TestCase):
                 ],
             },
         ]
-        loader = DataLoader(mapping=mapping, db=db)
+        loader = DataLoadEngine(mapping=mapping, db=db)
 
-        archive = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "test.zip")
+        archive = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets", "test.zip")
+
         loader.run(archive)
 
         ctr = 0
