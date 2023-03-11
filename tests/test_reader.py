@@ -24,6 +24,13 @@ class ReaderTest(unittest.TestCase):
         self.assertEqual(products[3]["product_name"], 'Morning Sunrise Chai Rg')
         self.assertEqual(len(products), 10)
 
+    def test_last_order_per_customer(self):
+        reader = DataReader()
+        users = reader.read_last_order_per_customer()
+        self.assertEqual(len(users), 2245)
+        self.assertEqual(users[0]["customer_id"], 1)
+        self.assertEqual(users[0]["customer_email"], "Venus@adipiscing.edu")
+        self.assertEqual(users[0]["last_order_date"], "2019-04-29")
 
 
 if __name__ == "__main__":

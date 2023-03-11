@@ -65,6 +65,32 @@ class SqliteEngine(ReaderEngine):
             })
         return result
 
+    def read_last_order_per_customer(self):
+        sql = """
+        SELECT c.customer_id, c.email, T.last_order_date
+        FROM (
+            SELECT 
+                customer_id,
+                MAX(transaction_date) AS last_order_date
+            FROM receipt r
+            WHERE r.customer_id IS NOT NULL
+            GROUP BY customer_id
+        ) T 
+        JOIN customer c ON T.customer_id = c.customer_id
+        ORDER BY c.customer_id ASC
+        """
+
+        rows = self.reader.db.session.execute(self.reader.db.text(sql))
+
+        result = []
+        for row in rows:
+            result.append({
+                "customer_id": row[0],
+                "customer_email": row[1],
+                "last_order_date": row[2],
+            })
+        return result
+
 
 
 class MySQLEngine(ReaderEngine):
@@ -109,6 +135,32 @@ class MySQLEngine(ReaderEngine):
             result.append({
                 "product_name": row[0],
                 "total_sales": row[1],
+            })
+        return result
+
+    def read_last_order_per_customer(self):
+        sql = """
+        SELECT c.customer_id, c.email, T.last_order_date
+        FROM (
+            SELECT 
+                customer_id,
+                MAX(transaction_date) AS last_order_date
+            FROM receipt r
+            WHERE r.customer_id IS NOT NULL
+            GROUP BY customer_id
+        ) T 
+        JOIN customer c ON T.customer_id = c.customer_id
+        ORDER BY c.customer_id ASC
+        """
+
+        rows = self.reader.db.session.execute(self.reader.db.text(sql))
+
+        result = []
+        for row in rows:
+            result.append({
+                "customer_id": row[0],
+                "customer_email": row[1],
+                "last_order_date": row[2].strftime('%Y-%m-%d'),
             })
         return result
 
@@ -158,6 +210,31 @@ class PostgreSQLEngine(ReaderEngine):
             })
         return result
 
+    def read_last_order_per_customer(self):
+        sql = """
+        SELECT c.customer_id, c.email, T.last_order_date
+        FROM (
+            SELECT 
+                customer_id,
+                MAX(transaction_date) AS last_order_date
+            FROM receipt r
+            WHERE r.customer_id IS NOT NULL
+            GROUP BY customer_id
+        ) T 
+        JOIN customer c ON T.customer_id = c.customer_id
+        ORDER BY c.customer_id ASC
+        """
+
+        rows = self.reader.db.session.execute(self.reader.db.text(sql))
+
+        result = []
+        for row in rows:
+            result.append({
+                "customer_id": row[0],
+                "customer_email": row[1],
+                "last_order_date": row[2].strftime('%Y-%m-%d'),
+            })
+        return result
 
 class DataReader:
     @property
@@ -199,4 +276,7 @@ class DataReader:
         return result
 
     def read_last_order_per_customer(self):
-        return self.engine.read_last_order_per_customer()
+        LOGGER.info("Reading last order per customer.")
+        result = self.engine.read_last_order_per_customer()
+        LOGGER.info("{} records found.".format(len(result)))
+        return result
