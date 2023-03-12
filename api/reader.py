@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 from config import Config
 from .engine import ReaderEngine, SqliteEngine, MySQLEngine, PostgreSQLEngine
+from .schemas import Birthday, TopSellingProduct, LastOrderPerCustomer
 
 
 LOGGER = logging.getLogger(__name__)
@@ -79,11 +80,11 @@ class DataReader:
         self._engine = None
         self._session = None
 
-    def read_birthdays(self, date:datetime.date = None) -> List[dict]:
+    def read_birthdays(self, date:datetime.date = None) -> List[Birthday]:
         """
         Get list of customers, which have birthday on the given date.
         :param date: datetime.date | None
-        :return: List[dict]
+        :return: List[Birthday]
         """
         if date is None:
             date = datetime.date.today()
@@ -92,21 +93,21 @@ class DataReader:
         LOGGER.info("{} records found.".format(len(result)))
         return result
 
-    def read_top_selling_products(self, year: int) -> List[dict]:
+    def read_top_selling_products(self, year: int) -> List[TopSellingProduct]:
         """
         The top 10 selling products for a specific year.
         :param year: int
-        :return: List[dict]
+        :return: List[TopSellingProduct]
         """
         LOGGER.info("Reading top selling products on '{}'".format(year))
         result = self.engine.read_top_selling_products(year)
         LOGGER.info("{} records found.".format(len(result)))
         return result
 
-    def read_last_order_per_customer(self) -> List[dict]:
+    def read_last_order_per_customer(self) -> List[LastOrderPerCustomer]:
         """
         The last order per customer with their email.
-        :return: List[dict]
+        :return: List[LastOrderPerCustomer]
         """
         LOGGER.info("Reading last order per customer.")
         result = self.engine.read_last_order_per_customer()

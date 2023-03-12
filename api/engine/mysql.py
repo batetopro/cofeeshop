@@ -1,15 +1,20 @@
 import datetime
+from typing import List
+
 
 from sqlalchemy import text
+
+
 from .abstract import ReaderEngine
+from ..schemas import Birthday, TopSellingProduct, LastOrderPerCustomer
 
 
 class MySQLEngine(ReaderEngine):
-    def read_birthdays(self, date:datetime.date):
+    def read_birthdays(self, date:datetime.date) -> List[Birthday]:
         """
         Get list of customers, which have birthday on the given date.
         :param date: datetime.date
-        :return: List[dict]
+        :return: List[Birthday]
         """
 
         sql = """
@@ -25,17 +30,17 @@ class MySQLEngine(ReaderEngine):
 
         result = []
         for row in rows:
-            result.append({
-                "customer_id": row[0],
-                "customer_first_name": row[1],
-            })
+            result.append(Birthday(
+                customer_id=row[0],
+                customer_first_name=row[1]
+            ))
         return result
 
-    def read_top_selling_products(self, year:int):
+    def read_top_selling_products(self, year:int) -> List[TopSellingProduct]:
         """
         The top 10 selling products for a specific year.
         :param year: int
-        :return: List[dict]
+        :return: List[TopSellingProduct]
         """
 
         sql = """
@@ -55,16 +60,16 @@ class MySQLEngine(ReaderEngine):
 
         result = []
         for row in rows:
-            result.append({
-                "product_name": row[0],
-                "total_sales": row[1],
-            })
+            result.append(TopSellingProduct(
+                product_name=row[0],
+                total_sales=row[1]
+            ))
         return result
 
-    def read_last_order_per_customer(self):
+    def read_last_order_per_customer(self) -> List[LastOrderPerCustomer]:
         """
         The last order per customer with their email.
-        :return: List[dict]
+        :return: List[LastOrderPerCustomer]
         """
         sql = """
         SELECT c.customer_id, c.email, T.last_order_date
@@ -84,9 +89,9 @@ class MySQLEngine(ReaderEngine):
 
         result = []
         for row in rows:
-            result.append({
-                "customer_id": row[0],
-                "customer_email": row[1],
-                "last_order_date": row[2].strftime('%Y-%m-%d'),
-            })
+            result.append(LastOrderPerCustomer(
+                customer_id=row[0],
+                customer_email=row[1],
+                last_order_date=row[2].strftime('%Y-%m-%d')
+            ))
         return result
