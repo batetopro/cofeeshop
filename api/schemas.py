@@ -27,4 +27,4 @@ class TopSellingProductResponse(BaseModel):
 
 
 class LastOrderPerCustomerResponse(BaseModel):
-    customers: LastOrderPerCustomer
+    customers: List[LastOrderPerCustomer]
