@@ -91,12 +91,12 @@ class DataLoadEngine:
         return csv.DictReader(data)
 
     @classmethod
-    def read_row(cls, row: dict, rule: dict) -> SQLAlchemy.Model:
+    def read_row(cls, row: dict, rule: dict):
         """
         Run a mapping rule over a single row from the CSV file and receive a SQLAlchemy.Model object.
         :param row: dict
         :param rule: dict
-        :return: SQLAlchemy.Model
+        :return:
         """
         kwargs = dict()
         for key, value in row.items():
