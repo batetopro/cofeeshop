@@ -43,7 +43,7 @@ def run_tests() -> None:
     """
 
     import unittest
-    tests = unittest.TestLoader().discover('loader.tests')
+    tests = unittest.TestLoader().discover('tests')
 
     test_runner = unittest.TextTestRunner()
     test_runner.run(tests)
