@@ -105,3 +105,12 @@ To run the tests, execute:
 ```commandline
 flask tests
 ```
+
+## docker
+To load the data and run the service as docker service,
+please check that you have docker installed.
+
+After that run:
+```commandline
+docker-compose up --build
+```
