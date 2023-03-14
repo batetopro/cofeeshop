@@ -1,0 +1,26 @@
+version: "3"
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://coffeeshop:abc123@postgres/coffeeshop
+      - PYTHONDONTWRITEBYTECODE=1
+    # volumes:
+    #   - ./api:/api
+    #   - ./loader:/loader
+    ports:
+      - "5005:80"
+
+
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=coffeeshop
+      - POSTGRES_PASSWORD=abc123
+    ports:
+      - "54321:5432"
