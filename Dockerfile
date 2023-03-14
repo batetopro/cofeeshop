@@ -22,4 +22,5 @@ COPY loader/ /coffeeshop/loader/
 
 WORKDIR /coffeeshop
 ENV FLASK_APP=/coffeeshop/coffeeshop.py FLASK_DEBUG=1 PYTHONUNBUFFERED=
-CMD sleep 5 && flask db init && flask db migrate -m "Make migrations." && flask db upgrade && flask load_data && uvicorn api.main:app --host 0.0.0.0 --port 80
+RUN flask db init && flask db migrate -m "Make migrations."
+CMD sleep 5 && flask db upgrade && flask load_data && uvicorn api.main:app --host 0.0.0.0 --port 80

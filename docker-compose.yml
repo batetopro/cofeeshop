@@ -10,17 +10,25 @@ services:
     environment:
       - DATABASE_URL=postgresql+psycopg2://coffeeshop:abc123@postgres/coffeeshop
       - PYTHONDONTWRITEBYTECODE=1
-    # volumes:
-    #   - ./api:/api
-    #   - ./loader:/loader
+    volumes:
+      - migrations:/coffeeshop/migrations
     ports:
       - "5005:80"
 
 
   postgres:
     image: postgres:9.6
+    restart: always
     environment:
       - POSTGRES_USER=coffeeshop
       - POSTGRES_PASSWORD=abc123
+    volumes:
+      - pgdb:/var/lib/postgresql/data
     ports:
       - "54321:5432"
+
+volumes:
+  pgdb:
+    driver: local
+  migrations:
+    driver: local
